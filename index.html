@@ -8,13 +8,16 @@
 <!-- Simulated logged‑in user (TEST VALUE) -->
 <script>
   // In your real app, this should be set by your backend.
-  window.APP_USER_EMAIL = "john.doe@acme.com";
+  const emails = 
+  // get random out of 3 different domains
+        ["john.doe@acme.com", "jane.doe@fi.test.com", "foo.bar@xyz.com"];
+    [window.APP_USER_EMAIL] = emails[Math.floor(Math.random() * emails.length)];
   console.log("Raw test email:", window.APP_USER_EMAIL);
 </script>
 
 <!-- Microsoft Clarity Embed + Hashed Domain Tagging -->
 <script type="text/javascript">
-  window._clarityNoConsentTest = true;
+    window._clarityNoConsentTest = true;
   // --- 1. Official Microsoft Clarity Embed -----------------------
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -32,14 +35,15 @@
 
     // --- 3. Inject hashed email-domain into Clarity ----------------
     (async function(){
-        //   const rawEmail = window.APP_USER_EMAIL;
+          const rawEmail = window.APP_USER_EMAIL;
 
-        //   if (!rawEmail) {
-        //       console.warn("No APP_USER_EMAIL defined, skipping hashing.");
-        //       return;
-        //   }
+          if (!rawEmail) {
+              console.warn("No APP_USER_EMAIL defined, skipping hashing.");
+              return;
+          }
 
-    const domain = "fi.abb.com";      // "acme.com"
+    const domain = rawEmail.split("@")[1];  // extract domain
+    console.log("Extracted domain:", domain);
     const hashedDomain = await sha256(domain);  // irreversible hash
 
     // 3. Pass hashed domain to Clarity as a custom tag
