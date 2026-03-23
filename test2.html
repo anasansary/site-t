@@ -8,13 +8,21 @@
 <!-- Simulated logged‑in user (TEST VALUE) -->
 <script>
   // In your real app, this should be set by your backend.
-  window.APP_USER_EMAIL = "john.doe@acme.com";
+  const emails = 
+  // get random out of 3 different domains
+        ["john.doe@acme.com", "jane.doe@fi.test.com", "foo.bar@xyz.com"];
+
+    // read mail index from query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const mailIndexParam = urlParams.get("mailIndex");
+    window.mailIndex = mailIndexParam !== null ? parseInt(mailIndexParam, 10) : Math.floor(Math.random() * emails.length);
+    window.APP_USER_EMAIL = emails[window.mailIndex];
   console.log("Raw test email:", window.APP_USER_EMAIL);
 </script>
 
 <!-- Microsoft Clarity Embed + Hashed Domain Tagging -->
 <script type="text/javascript">
-  window._clarityNoConsentTest = true;
+    window._clarityNoConsentTest = true;
   // --- 1. Official Microsoft Clarity Embed -----------------------
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -32,14 +40,15 @@
 
     // --- 3. Inject hashed email-domain into Clarity ----------------
     (async function(){
-        //   const rawEmail = window.APP_USER_EMAIL;
+          const rawEmail = window.APP_USER_EMAIL;
 
-        //   if (!rawEmail) {
-        //       console.warn("No APP_USER_EMAIL defined, skipping hashing.");
-        //       return;
-        //   }
+          if (!rawEmail) {
+              console.warn("No APP_USER_EMAIL defined, skipping hashing.");
+              return;
+          }
 
-    const domain = "fi.abb.com";      // "acme.com"
+    const domain = rawEmail.split("@")[1];  // extract domain
+    console.log("Extracted domain:", domain);
     const hashedDomain = await sha256(domain);  // irreversible hash
 
     // 3. Pass hashed domain to Clarity as a custom tag
@@ -54,7 +63,7 @@
 </head>
 <body>
 <h1>Microsoft Clarity Hashed Domain Test Page</h1>
-<p>Test Page.</p>
+<p>This page demonstrates injecting a hashed email domain into Clarity.</p>
 
 <p>Open the browser console (F12 → Console) to see:</p>
 <ul>
@@ -64,6 +73,12 @@
   <li>Clarity tagging confirmation</li>
 </ul>
 
-<a href="index.html?mailIndex=<script>document.write(window.mailIndex);</script>">Home</a>
+
+<script>
+    document.write("<p>Current test email: " + window.APP_USER_EMAIL + "</p>");
+    // add the link to the next test page with the current mail index
+    document.write("<p><a href='index.html?mailIndex=" + window.mailIndex + "'>Back home with same email</a></p>");
+</script>
+
 </body>
 </html>
