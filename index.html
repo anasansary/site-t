@@ -11,7 +11,12 @@
   const emails = 
   // get random out of 3 different domains
         ["john.doe@acme.com", "jane.doe@fi.test.com", "foo.bar@xyz.com"];
-    [window.APP_USER_EMAIL] = emails[Math.floor(Math.random() * emails.length)];
+
+    // read mail index from query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const mailIndexParam = urlParams.get("mailIndex");
+    window.mailIndex = mailIndexParam !== null ? parseInt(mailIndexParam, 10) : Math.floor(Math.random() * emails.length);
+    window.APP_USER_EMAIL = emails[window.mailIndex];
   console.log("Raw test email:", window.APP_USER_EMAIL);
 </script>
 
@@ -68,6 +73,6 @@
   <li>Clarity tagging confirmation</li>
 </ul>
 
-<a href="test2.html">Test 2</a>
+<a href="test2.html?mailIndex=<script>document.write(window.mailIndex);</script>">Test 2</a>
 </body>
 </html>
