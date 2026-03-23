@@ -73,6 +73,12 @@
   <li>Clarity tagging confirmation</li>
 </ul>
 
-<a href="test2.html?mailIndex=<script>document.write(window.mailIndex);</script>">Test 2</a>
+
+<script>
+    document.write("<p>Current test email: " + window.APP_USER_EMAIL + "</p>");
+    // add the link to the next test page with the current mail index
+    document.write("<p><a href='test2.html?mailIndex=" + window.mailIndex + "'>Go to Test 2 with same email</a></p>");
+</script>
+
 </body>
 </html>
