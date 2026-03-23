@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Clarity Hashed Domain Test</title>
+
+<!-- Simulated logged‑in user (TEST VALUE) -->
+<script>
+  // In your real app, this should be set by your backend.
+  window.APP_USER_EMAIL = "john.doe@acme.com";
+  console.log("Raw test email:", window.APP_USER_EMAIL);
+</script>
+
+<!-- Microsoft Clarity Embed + Hashed Domain Tagging -->
+<script type="text/javascript">
+  // --- 1. Official Microsoft Clarity Embed -----------------------
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "w094gkxmvk");
+
+    // --- 2. SHA‑256 hashing utility -------------------------------
+    async function sha256(text) {
+        const data = new TextEncoder().encode(text);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    // --- 3. Inject hashed email-domain into Clarity ----------------
+    (async function(){
+        //   const rawEmail = window.APP_USER_EMAIL;
+
+        //   if (!rawEmail) {
+        //       console.warn("No APP_USER_EMAIL defined, skipping hashing.");
+        //       return;
+        //   }
+
+    const domain = "fi.abb.com";      // "acme.com"
+    const hashedDomain = await sha256(domain);  // irreversible hash
+
+    // 3. Pass hashed domain to Clarity as a custom tag
+    window.clarity = window.clarity || function(){(window.clarity.q=window.clarity.q||[]).push(arguments)};
+    clarity("set", "user_domain", domain);
+    clarity("set", "user_domain_hash", hashedDomain);
+    console.log("SHA-256 Hashed Domain:", hashedDomain);
+    console.log("Sent hashed domain to Clarity as: user_domain_hash");
+  })();
+</script>
+
+</head>
+<body>
+<h1>Microsoft Clarity Hashed Domain Test Page</h1>
+<p>This page demonstrates injecting a hashed email domain into Clarity.</p>
+
+<p>Open the browser console (F12 → Console) to see:</p>
+<ul>
+  <li>Raw test email</li>
+  <li>Extracted domain</li>
+  <li>SHA‑256 hashed output</li>
+  <li>Clarity tagging confirmation</li>
+</ul>
+
+</body>
+</html>
